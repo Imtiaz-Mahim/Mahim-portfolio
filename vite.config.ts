@@ -3,8 +3,11 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
-export default defineConfig(() => {
+export default defineConfig(({ command }) => {
+  // Use /Mahim-portfolio/ for GitHub Pages builds, / for dev and local preview
+  const isGitHubPages = process.env.GITHUB_PAGES === 'true' || (command === 'build' && process.env.AI_STUDIO !== 'true');
   return {
+    base: isGitHubPages ? '/Mahim-portfolio/' : '/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

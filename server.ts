@@ -21,7 +21,20 @@ import {
 
 dotenv.config();
 
-const PORT = Number(process.env.PORT) || 3000;
+function resolvePort(): number {
+  const portArgIndex = process.argv.indexOf('--port');
+  if (portArgIndex !== -1 && process.argv[portArgIndex + 1]) {
+    const parsed = parseInt(process.argv[portArgIndex + 1], 10);
+    if (!isNaN(parsed) && parsed > 0) return parsed;
+  }
+  const envPort = Number(process.env.PORT);
+  if (envPort && envPort !== 8080) {
+    return envPort;
+  }
+  return 3000;
+}
+
+const PORT = resolvePort();
 const DATA_DIR = path.resolve(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'portfolio-db.json');
 
@@ -123,6 +136,17 @@ const VALID_LAYOUTS: LayoutType[] = [
 async function startServer() {
   const app = express();
   app.use(express.json({ limit: '5mb' }));
+
+  // Support both root path and GitHub Pages base path in dev/preview
+  app.use((req, res, next) => {
+    if (req.url.startsWith('/Mahim-portfolio/')) {
+      req.url = req.url.replace('/Mahim-portfolio', '') || '/';
+    } else if (req.url === '/Mahim-portfolio') {
+      res.redirect(301, '/');
+      return;
+    }
+    next();
+  });
 
   // ============================================================================
   // PUBLIC PORTFOLIO ENDPOINTS (Only serves published content to visitors)
@@ -913,8 +937,22 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Ahmed Imtiaz Mahim Portfolio & Private Studio Server running on http://0.0.0.0:${PORT}`);
+  });
+
+  server.on('error', (err: NodeJS.ErrnoException) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`Port ${PORT} is currently in use.`, err);
+    } else {
+      console.error('Server error:', err);
+    }
+  });
+
+  process.on('SIGTERM', () => {
+    server.close(() => {
+      process.exit(0);
+    });
   });
 }
 

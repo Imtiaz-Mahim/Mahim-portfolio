@@ -40,7 +40,9 @@ export function App() {
     }
   }, [settings.seoTitle]);
 
-  const isPrivateStudioRoute = pathname.startsWith('/private-studio');
+  const isPrivateStudioRoute =
+    pathname.includes('/private-studio') ||
+    window.location.hash.includes('private-studio');
 
   if (isPrivateStudioRoute) {
     return <PrivateStudioView onPublicDataChanged={fetchPublicPortfolio} />;

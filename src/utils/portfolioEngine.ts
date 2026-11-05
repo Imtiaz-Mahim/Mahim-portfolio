@@ -8,10 +8,11 @@ import {
   SiteSettings,
 } from '../types/portfolio';
 
-export const PORTRAIT_IMAGE_URL = '/src/assets/images/profile_portrait_mahim_1793837250035.jpg';
-export const OPTIMAL_CONTROL_IMAGE_URL = '/src/assets/images/project_optimal_control_1793837251139.jpg';
-export const NEROBYTES_WEB_IMAGE_URL = '/src/assets/images/project_nerobytes_web_1793837251740.jpg';
-export const SKETCH_STUDY_IMAGE_URL = '/src/assets/images/creative_sketch_study_1793837251622.jpg';
+const BASE_ASSET_PATH = (import.meta.env?.BASE_URL || '/').replace(/\/$/, '') + '/assets/images/';
+export const PORTRAIT_IMAGE_URL = `${BASE_ASSET_PATH}profile_portrait_mahim_1793837250035.jpg`;
+export const OPTIMAL_CONTROL_IMAGE_URL = `${BASE_ASSET_PATH}project_optimal_control_1793837251139.jpg`;
+export const NEROBYTES_WEB_IMAGE_URL = `${BASE_ASSET_PATH}project_nerobytes_web_1793837251740.jpg`;
+export const SKETCH_STUDY_IMAGE_URL = `${BASE_ASSET_PATH}creative_sketch_study_1793837251622.jpg`;
 
 export function slugify(text: string): string {
   return text
